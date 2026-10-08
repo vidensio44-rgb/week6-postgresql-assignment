@@ -83,7 +83,7 @@ The base backup successfully produced:
 
 ---
 
-## 5. Point-in-Time Recovery (PITR)
+## ## 5. Point-in-Time Recovery (PITR)
 
 A disaster scenario was simulated by deleting all records from the `students` table.
 
@@ -100,6 +100,24 @@ DELETE FROM students;
 The database was recovered using the physical base backup and archived WAL files.
 
 The recovered database was started on port `5433` to keep it separate from the main PostgreSQL server.
+
+### PITR Recovery Configuration
+
+The following recovery settings were used for the PITR instance:
+
+```conf
+port = 5433
+
+restore_command = 'cmd.exe /c C:/Users/UBUNTU/pitr_recovery/restore_wal.bat %f %p'
+
+recovery_target_time = '2026-10-07 15:54:43.648772+03'
+
+recovery_target_action = 'pause'
+```
+
+A `recovery.signal` file was also created in the PITR recovery directory to enable recovery mode.
+
+The `restore_command` retrieved archived WAL files from the WAL archive using the Windows recovery script. The `recovery_target_time` specified the point immediately before the simulated deletion, while `recovery_target_action = 'pause'` instructed PostgreSQL to pause when the recovery target was reached.
 
 The recovery was successful.
 
@@ -118,6 +136,7 @@ Result:
 All five original student records were successfully recovered.
 
 ---
+
 
 ## 6. Streaming Replication
 
